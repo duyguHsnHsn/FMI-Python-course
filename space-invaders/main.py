@@ -1,4 +1,5 @@
 import pygame
+import math
 
 from enemy import Enemy
 from player import Player, Bullet, BulletState
@@ -11,14 +12,26 @@ background = pygame.image.load('images/space.jpg')
 background = pygame.transform.scale(background, (900, 600))
 
 player = Player()
-enemy = Enemy()
+enemies = []
+enemies_count = 5
 bullet = Bullet()
+score = 0
+
+for i in range(enemies_count):
+    enemies.append(Enemy())
 
 
 def fire_bullet():
     bullet.state = BulletState.FIRE
     bullet.fire()
     screen.blit(bullet.img, (bullet.x, bullet.y))
+
+
+def collision(enemy_x, enemy_y, bullet_x, bullet_y):
+    distance = math.sqrt(math.pow(enemy_x - bullet_x, 2) + math.pow(enemy_y - bullet_y, 2))
+    if distance < 50:  # collision has occurred
+        return True
+    return False
 
 
 # Game's loop
@@ -42,12 +55,21 @@ while run:
     screen.blit(background, (0, 0))
 
     player.relocate()
-    enemy.relocate()
+    for i in range(enemies_count):
+        enemies[i].relocate()
+        if collision(enemies[i].x, enemies[i].y, bullet.x, bullet.y):
+            bullet.reset(player.x)
+            score += 1
+            print(score)
+            enemies[i].reset()
+        screen.blit(enemies[i].img, (enemies[i].x, enemies[i].y))
+
+    if bullet.y <= 0:
+        bullet.reset(player.x)
 
     if bullet.state == BulletState.FIRE:
         bullet.fire()
         screen.blit(bullet.img, (bullet.x, bullet.y))
 
     screen.blit(player.img, (player.x, player.y))
-    screen.blit(enemy.img, (enemy.x, enemy.y))
     pygame.display.update()
