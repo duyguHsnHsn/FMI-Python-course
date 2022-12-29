@@ -7,7 +7,7 @@ from utils import fix_x_against_borders
 
 class Enemy:
     def __init__(self):
-        self.img = pygame.image.load("enemy.png")
+        self.img = pygame.image.load("images/enemy.png")
         self.img = pygame.transform.scale(self.img, (64, 64))
         self.x = random.randint(0, 830)
         self.y = random.randint(50, 120)

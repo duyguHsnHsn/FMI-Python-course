@@ -7,7 +7,7 @@ from utils import fix_x_against_borders
 
 class Player:
     def __init__(self):
-        self.img = pygame.image.load("spaceship.png")
+        self.img = pygame.image.load("images/spaceship.png")
         self.img = pygame.transform.scale(self.img, (64, 64))
         self.x = 400
         self.y = 500
@@ -23,7 +23,7 @@ class BulletState(Enum):
 
 class Bullet:
     def __init__(self):
-        self.img = pygame.image.load("circle.png")
+        self.img = pygame.image.load("images/circle.png")
         self.img = pygame.transform.scale(self.img, (16, 16))
         self.state = BulletState.READY
         self.x = 425  # player x + 25

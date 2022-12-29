@@ -7,7 +7,7 @@ pygame.init()
 
 screen = pygame.display.set_mode((900, 600))
 pygame.display.set_caption("Space Invaders")
-background = pygame.image.load('space.jpg')
+background = pygame.image.load('images/space.jpg')
 background = pygame.transform.scale(background, (900, 600))
 
 player = Player()
@@ -30,10 +30,12 @@ while run:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 player.x -= 20
-                bullet.x -= 20
+                if bullet.state == BulletState.READY:
+                    bullet.x -= 20
             if event.key == pygame.K_RIGHT:
                 player.x += 20
-                bullet.x += 20
+                if bullet.state == BulletState.READY:
+                    bullet.x += 20
             if event.key == pygame.K_SPACE:
                 fire_bullet()
     screen.fill((0, 0, 0))
