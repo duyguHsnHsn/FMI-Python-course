@@ -1,8 +1,8 @@
 import pygame
-import math
 
-from enemy import Enemy
+from enemy import Enemy, Boss
 from player import Player, Bullet, BulletState
+from utils import collision
 
 pygame.init()
 
@@ -12,70 +12,87 @@ background = pygame.image.load('images/space.jpg')
 background = pygame.transform.scale(background, (900, 600))
 font = pygame.font.Font('freesansbold.ttf', 32)
 
-player = Player()
-enemies = []
-enemies_count = 5
-bullet = Bullet()
-score = 0
 
-for i in range(enemies_count):
-    enemies.append(Enemy())
+class Game:
+    def __init__(self, enemies_count):
+        self._player = Player()
+        self._enemies = []
+        self._enemies_count = enemies_count
+        self._bullet = Bullet()
+        self._boss = Boss()
+        self._score = 0
+        for i in range(self._enemies_count):
+            self._enemies.append(Enemy())
+
+    def _fire_bullet(self):
+        self._bullet.state = BulletState.FIRE
+        self._bullet.fire()
+        screen.blit(self._bullet.img, (self._bullet.x, self._bullet.y))
+
+    def show_score(self):
+        result = font.render(str(self._score), True, (255, 255, 255))
+        screen.blit(result, (10, 10))
+
+    def _vanish_enemies(self):
+        for i in range(self._enemies_count):
+            self._enemies[i].y = 1500  # they vanish
+
+    def game_over(self):
+        result = font.render("Game over! " + "Your score: " + str(self._score), True, (255, 255, 255))
+        screen.blit(result, (250, 400))
+
+    def start(self):
+        # Game loop
+        run = True
+        while run:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        self._player.x -= 30
+                        if self._bullet.state == BulletState.READY:
+                            self._bullet.x -= 30
+                    if event.key == pygame.K_RIGHT:
+                        self._player.x += 30
+                        if self._bullet.state == BulletState.READY:
+                            self._bullet.x += 30
+                    if event.key == pygame.K_SPACE:
+                        self._fire_bullet()
+            screen.fill((0, 0, 0))
+            screen.blit(background, (0, 0))
+
+            self._player.relocate()
+            screen.blit(self._player.img, (self._player.x, self._player.y))
+
+            for i in range(self._enemies_count):
+                # end game
+                if 400 < self._enemies[i].y < 600:
+                    self._vanish_enemies()
+                    self.game_over()
+                    break
+
+                self._enemies[i].relocate()
+                if collision(self._enemies[i].x, self._enemies[i].y, self._bullet.x, self._bullet.y):
+                    self._bullet.reset(self._player.x)
+                    self._score += 1
+                    self._enemies[i].reset()
+                screen.blit(self._enemies[i].img, (self._enemies[i].x, self._enemies[i].y))
+
+            if self._bullet.y <= 0:
+                self._bullet.reset(self._player.x)
+
+            if self._bullet.state == BulletState.FIRE:
+                self._bullet.fire()
+                screen.blit(self._bullet.img, (self._bullet.x, self._bullet.y))
+
+            self.show_score()
+            if self._score >= 5:
+                self._vanish_enemies()
+                screen.blit(self._boss.img, (self._boss.x, self._boss.y))
+
+            pygame.display.update()
 
 
-def fire_bullet():
-    bullet.state = BulletState.FIRE
-    bullet.fire()
-    screen.blit(bullet.img, (bullet.x, bullet.y))
-
-
-def collision(enemy_x, enemy_y, bullet_x, bullet_y):
-    distance = math.sqrt(math.pow(enemy_x - bullet_x, 2) + math.pow(enemy_y - bullet_y, 2))
-    if distance < 50:  # collision has occurred
-        return True
-    return False
-
-
-def show_score():
-    result = font.render(str(score), True, (255, 255, 255))
-    screen.blit(result, (10, 10))
-
-
-# Game's loop
-run = True
-while run:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                player.x -= 30
-                if bullet.state == BulletState.READY:
-                    bullet.x -= 30
-            if event.key == pygame.K_RIGHT:
-                player.x += 30
-                if bullet.state == BulletState.READY:
-                    bullet.x += 30
-            if event.key == pygame.K_SPACE:
-                fire_bullet()
-    screen.fill((0, 0, 0))
-    screen.blit(background, (0, 0))
-
-    player.relocate()
-    for i in range(enemies_count):
-        enemies[i].relocate()
-        if collision(enemies[i].x, enemies[i].y, bullet.x, bullet.y):
-            bullet.reset(player.x)
-            score += 1
-            enemies[i].reset()
-        screen.blit(enemies[i].img, (enemies[i].x, enemies[i].y))
-
-    if bullet.y <= 0:
-        bullet.reset(player.x)
-
-    if bullet.state == BulletState.FIRE:
-        bullet.fire()
-        screen.blit(bullet.img, (bullet.x, bullet.y))
-
-    screen.blit(player.img, (player.x, player.y))
-    show_score()
-    pygame.display.update()
+game = Game(5)
+game.start()
