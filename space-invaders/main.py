@@ -1,23 +1,40 @@
 import pygame
-
+import random
+from utils import fix_x_against_borders
 pygame.init()
 
 screen = pygame.display.set_mode((900, 600))
 pygame.display.set_caption("Space Invaders")
 
-# Player
-player = pygame.image.load("spaceship.png")
-player = pygame.transform.scale(player, (64, 64))
-playerX = 400
-playerY = 500
+
+class Player:
+    def __init__(self):
+        self.img = pygame.image.load("spaceship.png")
+        self.img = pygame.transform.scale(self.img, (64, 64))
+        self.x = 400
+        self.y = 500
+
+    def relocate(self):
+        self.x = fix_x_against_borders(self.x)
+        screen.blit(self.img, (self.x, self.y))
 
 
-def put_player(x, y):
-    if x < 0:
-        x = 0
-    if x > 830:
-        x = 830
-    screen.blit(player, (x, y))
+player = Player()
+
+
+class Enemy:
+    def __init__(self):
+        self.img = pygame.image.load("enemy.png")
+        self.img = pygame.transform.scale(self.img, (64, 64))
+        self.x = random.randint(0, 830)
+        self.y = random.randint(50, 120)
+
+    def relocate(self):
+        self.x = fix_x_against_borders(self.x)
+        screen.blit(self.img, (self.x, self.y))
+
+
+enemy = Enemy()
 
 
 # Game's loop
@@ -28,9 +45,10 @@ while run:
             run = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                playerX -= 10
+                player.x -= 10
             if event.key == pygame.K_RIGHT:
-                playerX += 10
+                player.y += 10
     screen.fill((0, 0, 0))
-    put_player(playerX, playerY)
+    player.relocate()
+    enemy.relocate()
     pygame.display.update()
