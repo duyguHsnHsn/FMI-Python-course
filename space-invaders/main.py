@@ -10,6 +10,7 @@ screen = pygame.display.set_mode((900, 600))
 pygame.display.set_caption("Space Invaders")
 background = pygame.image.load('images/space.jpg')
 background = pygame.transform.scale(background, (900, 600))
+font = pygame.font.Font('freesansbold.ttf', 32)
 
 player = Player()
 enemies = []
@@ -34,6 +35,11 @@ def collision(enemy_x, enemy_y, bullet_x, bullet_y):
     return False
 
 
+def show_score():
+    result = font.render(str(score), True, (255, 255, 255))
+    screen.blit(result, (10, 10))
+
+
 # Game's loop
 run = True
 while run:
@@ -42,13 +48,13 @@ while run:
             run = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                player.x -= 20
+                player.x -= 30
                 if bullet.state == BulletState.READY:
-                    bullet.x -= 20
+                    bullet.x -= 30
             if event.key == pygame.K_RIGHT:
-                player.x += 20
+                player.x += 30
                 if bullet.state == BulletState.READY:
-                    bullet.x += 20
+                    bullet.x += 30
             if event.key == pygame.K_SPACE:
                 fire_bullet()
     screen.fill((0, 0, 0))
@@ -60,7 +66,6 @@ while run:
         if collision(enemies[i].x, enemies[i].y, bullet.x, bullet.y):
             bullet.reset(player.x)
             score += 1
-            print(score)
             enemies[i].reset()
         screen.blit(enemies[i].img, (enemies[i].x, enemies[i].y))
 
@@ -72,4 +77,5 @@ while run:
         screen.blit(bullet.img, (bullet.x, bullet.y))
 
     screen.blit(player.img, (player.x, player.y))
+    show_score()
     pygame.display.update()

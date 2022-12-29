@@ -31,7 +31,7 @@ class Bullet:
 
     def fire(self):
         if self.state == BulletState.FIRE:
-            self.y -= 3
+            self.y -= 5
 
     def reset(self, player_x):
         self.x = player_x + 25

@@ -27,7 +27,7 @@ class Enemy:
         self.x += self.direction
 
     def move_against_y(self):
-        self.y += 10
+        self.y += 50
 
     def reset(self):
         self.x = random.randint(0, 830)
