@@ -41,6 +41,19 @@ class Game:
         result = font.render("Game over! " + "Your score: " + str(self._score), True, (255, 255, 255))
         screen.blit(result, (250, 400))
 
+    def _check_movements(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                self._player.x -= 30
+                if self._bullet.state == BulletState.READY:
+                    self._bullet.x -= 30
+            if event.key == pygame.K_RIGHT:
+                self._player.x += 30
+                if self._bullet.state == BulletState.READY:
+                    self._bullet.x += 30
+            if event.key == pygame.K_SPACE:
+                self._fire_bullet()
+
     def start(self):
         # Game loop
         run = True
@@ -48,36 +61,28 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
-                        self._player.x -= 30
-                        if self._bullet.state == BulletState.READY:
-                            self._bullet.x -= 30
-                    if event.key == pygame.K_RIGHT:
-                        self._player.x += 30
-                        if self._bullet.state == BulletState.READY:
-                            self._bullet.x += 30
-                    if event.key == pygame.K_SPACE:
-                        self._fire_bullet()
+                self._check_movements(event)
+
             screen.fill((0, 0, 0))
             screen.blit(background, (0, 0))
 
-            self._player.relocate()
-            screen.blit(self._player.img, (self._player.x, self._player.y))
+            if self._score < 5:
+                for i in range(self._enemies_count):
+                    # end game
+                    if 400 < self._enemies[i].y < 600:
+                        self._vanish_enemies()
+                        self.game_over()
+                        break
 
-            for i in range(self._enemies_count):
-                # end game
-                if 400 < self._enemies[i].y < 600:
-                    self._vanish_enemies()
-                    self.game_over()
-                    break
-
-                self._enemies[i].relocate()
-                if collision(self._enemies[i].x, self._enemies[i].y, self._bullet.x, self._bullet.y):
-                    self._bullet.reset(self._player.x)
-                    self._score += 1
-                    self._enemies[i].reset()
-                screen.blit(self._enemies[i].img, (self._enemies[i].x, self._enemies[i].y))
+                    self._enemies[i].relocate()
+                    if collision(self._enemies[i].x, self._enemies[i].y, self._bullet.x, self._bullet.y):
+                        self._bullet.reset(self._player.x)
+                        self._score += 1
+                        self._enemies[i].reset()
+                    screen.blit(self._enemies[i].img, (self._enemies[i].x, self._enemies[i].y))
+            else:
+                self._vanish_enemies()
+                screen.blit(self._boss.img, (self._boss.x, self._boss.y))
 
             if self._bullet.y <= 0:
                 self._bullet.reset(self._player.x)
@@ -87,9 +92,9 @@ class Game:
                 screen.blit(self._bullet.img, (self._bullet.x, self._bullet.y))
 
             self.show_score()
-            if self._score >= 5:
-                self._vanish_enemies()
-                screen.blit(self._boss.img, (self._boss.x, self._boss.y))
+
+            self._player.relocate()
+            screen.blit(self._player.img, (self._player.x, self._player.y))
 
             pygame.display.update()
 
