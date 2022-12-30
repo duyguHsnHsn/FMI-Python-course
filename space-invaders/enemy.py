@@ -36,8 +36,3 @@ class Enemy(EnemyElement):
         self.x = random.randint(0, 830)
         self.y = random.randint(50, 120)
         self.direction = -1.5
-
-
-class Boss(EnemyElement):
-    def __init__(self):
-        super().__init__("images/monster.png", 128, random.randint(0, 830), 100)

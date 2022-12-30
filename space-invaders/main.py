@@ -1,6 +1,6 @@
 import pygame
 
-from enemy import Enemy, Boss
+from enemy import Enemy
 from player import Player, Bullet, BulletState
 from utils import collision
 
@@ -19,7 +19,6 @@ class Game:
         self._enemies = []
         self._enemies_count = enemies_count
         self._bullet = Bullet()
-        self._boss = Boss()
         self._score = 0
         for i in range(self._enemies_count):
             self._enemies.append(Enemy())
@@ -66,23 +65,19 @@ class Game:
             screen.fill((0, 0, 0))
             screen.blit(background, (0, 0))
 
-            if self._score < 5:
-                for i in range(self._enemies_count):
-                    # end game
-                    if 400 < self._enemies[i].y < 600:
-                        self._vanish_enemies()
-                        self.game_over()
-                        break
+            for i in range(self._enemies_count):
+                # end game
+                if 400 < self._enemies[i].y < 600:
+                    self._vanish_enemies()
+                    self.game_over()
+                    break
 
-                    self._enemies[i].relocate()
-                    if collision(self._enemies[i].x, self._enemies[i].y, self._bullet.x, self._bullet.y):
-                        self._bullet.reset(self._player.x)
-                        self._score += 1
-                        self._enemies[i].reset()
-                    screen.blit(self._enemies[i].img, (self._enemies[i].x, self._enemies[i].y))
-            else:
-                self._vanish_enemies()
-                screen.blit(self._boss.img, (self._boss.x, self._boss.y))
+                self._enemies[i].relocate()
+                if collision(self._enemies[i].x, self._enemies[i].y, self._bullet.x, self._bullet.y):
+                    self._bullet.reset(self._player.x)
+                    self._score += 1
+                    self._enemies[i].reset()
+                screen.blit(self._enemies[i].img, (self._enemies[i].x, self._enemies[i].y))
 
             if self._bullet.y <= 0:
                 self._bullet.reset(self._player.x)
