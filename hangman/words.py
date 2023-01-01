@@ -7,4 +7,4 @@ WORDS = response.content.decode("utf-8").splitlines()
 
 
 def get_random_word():
-    return WORDS[random.randint(0, 10001)]
+    return WORDS[random.randint(0, len(WORDS))]
