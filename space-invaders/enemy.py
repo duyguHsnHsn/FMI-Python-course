@@ -1,6 +1,5 @@
 import random
 
-import pygame
 
 from utils import fix_x_against_borders
 from window_element import WindowElement
