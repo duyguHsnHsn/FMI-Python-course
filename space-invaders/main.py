@@ -13,6 +13,7 @@ background = pygame.transform.scale(background, (900, 600))
 font = pygame.font.Font('freesansbold.ttf', 32)
 clock = pygame.time.Clock()
 
+
 class Game:
     def __init__(self, enemies_count):
         self._player = Player()
