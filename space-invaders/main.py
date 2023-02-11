@@ -11,7 +11,7 @@ pygame.display.set_caption("Space Invaders")
 background = pygame.image.load('images/space.jpg')
 background = pygame.transform.scale(background, (900, 600))
 font = pygame.font.Font('freesansbold.ttf', 32)
-
+clock = pygame.time.Clock()
 
 class Game:
     def __init__(self, enemies_count):
@@ -92,6 +92,7 @@ class Game:
             screen.blit(self._player.img, (self._player.x, self._player.y))
 
             pygame.display.update()
+            clock.tick(60)
 
 
 game = Game(5)
