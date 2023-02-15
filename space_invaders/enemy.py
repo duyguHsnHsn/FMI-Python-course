@@ -13,7 +13,7 @@ class EnemyElement(WindowElement):
 
 class Enemy(EnemyElement):
     def __init__(self):
-        super().__init__("images/enemy.png", 64, random.randint(0, 830), random.randint(50, 120))
+        super().__init__("../images/enemy.png", 64, random.randint(0, 830), random.randint(50, 120))
 
     def relocate(self):
         self.x = fix_x_against_borders(self.x)

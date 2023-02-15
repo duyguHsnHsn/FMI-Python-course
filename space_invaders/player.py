@@ -8,7 +8,7 @@ from window_element import WindowElement
 
 class Player(WindowElement):
     def __init__(self):
-        super().__init__("images/spaceship.png", 64, 400, 500)
+        super().__init__("../images/spaceship.png", 64, 400, 500)
 
     def relocate(self):
         self.x = fix_x_against_borders(self.x)
@@ -21,7 +21,7 @@ class BulletState(Enum):
 
 class Bullet(WindowElement):
     def __init__(self):
-        super().__init__("images/circle.png", 16, 425, 490)
+        super().__init__("../images/circle.png", 16, 425, 490)
         self.state = BulletState.READY
 
     def fire(self):
