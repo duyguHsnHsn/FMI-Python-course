@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from sys import exit
 
@@ -6,9 +8,11 @@ screen = pygame.display.set_mode((900, 600))
 pygame.display.set_caption("Run and jump")
 clock = pygame.time.Clock()
 font = pygame.font.Font('freesansbold.ttf', 32)
-enemy_image = pygame.image.load("images/enemy.png").convert_alpha()
-background_image = pygame.image.load("images/background.png").convert()
-player_image = pygame.image.load("images/marathon.png").convert_alpha()
+enemy_image = pygame.image.load("../images/enemy1.png").convert_alpha()
+background_image = pygame.image.load("../images/background.png").convert()
+player_image = pygame.image.load("../images/marathon.png").convert_alpha()
+bird_image = pygame.image.load("../images/dove.png").convert_alpha()
+coin_image = pygame.image.load("../images/dollar.png").convert_alpha()
 
 
 class RunAndJumpGame:
@@ -18,6 +22,8 @@ class RunAndJumpGame:
         self._enemy = enemy_image.get_rect(bottomright=(800, 530))
         self._background = pygame.transform.scale(background_image, (900, 600))
         self._player = player_image.get_rect(bottomleft=(80, 540))
+        self._bird = bird_image.get_rect(bottomright=(800, 430))
+        self._coin = coin_image.get_rect(bottomright=(800, 480))
 
     def _player_jump(self):
         self._game_gravity = -20
@@ -29,9 +35,23 @@ class RunAndJumpGame:
     def _move_enemy(self):
         self._enemy.x -= 3.5
 
+    def _move_bird(self):
+        self._bird.x -= 1.5
+
+    def _move_coin(self):
+        self._coin.x -= 2
+
     def _fix_enemy_against_screen_borders(self):
         if self._enemy.right <= 0:
             self._enemy.left = 900
+
+    def _fix_birds_position(self):
+        if self._bird.right <= 0:
+            self._bird.left = random.randint(900, 920)
+
+    def _fix_coin_position(self):
+            self._coin.left = random.randint(900, 920)
+            self._coin.y = random.randint(430, 500)
 
     def start(self):
         run = True
@@ -46,20 +66,32 @@ class RunAndJumpGame:
             screen.blit(self._background, (0, 0))
             screen.blit(enemy_image, self._enemy)
             screen.blit(player_image, self._player)
+            screen.blit(bird_image, self._bird)
+            screen.blit(coin_image, self._coin)
 
             self._move_enemy()
+            self._move_bird()
+            self._move_coin()
             self._fix_enemy_against_screen_borders()
+            if self._coin.right <= 0:
+                self._fix_coin_position()
+            self._fix_birds_position()
 
-            # collision
+            # collision with the enemy
             if self._player.colliderect(self._enemy):
+                run = False
+
+            # collision with the bird
+            if self._player.colliderect(self._bird):
                 run = False
 
             self._game_gravity += 1
             self._player.y += self._game_gravity
             self._fix_player_against_ground()
 
-            if self._player.x == self._enemy.x:
+            if self._player.x == self._coin.x:
                 self._score += 1
+                self._fix_coin_position()
 
             result = font.render(str(self._score), True, (255, 255, 255))
             screen.blit(result, (10, 10))
