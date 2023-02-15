@@ -1,7 +1,7 @@
 import pygame
 import random
 
-from coin_collector.moving_element import MovingElement
+from moving_element import MovingElement
 
 # Initialize Pygame
 pygame.init()
@@ -16,10 +16,10 @@ clock = pygame.time.Clock()
 
 
 class CoinCollectorGame:
-    def __init__(self):
+    def __init__(self, bot_speed):
         # Set up the player and bot
         self.player = MovingElement(win_width, win_height, 50, "../images/purse.png", 5)
-        self.bot = MovingElement(win_width, win_height, 50, "../images/robot.png", 2)
+        self.bot = MovingElement(win_width, win_height, 50, "../images/robot.png", bot_speed)
         self.bot.y = 10
         self.bot.rect = self.bot.image.get_rect(bottomleft=(self.bot.x, self.bot.y))
 
