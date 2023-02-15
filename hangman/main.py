@@ -1,92 +1,80 @@
-from words import get_random_word
-from os import system
+import pygame
+import random
 
+# Initialize Pygame
+pygame.init()
 
-class Hangman:
-    def __init__(self):
-        self.incorrect_count = 0
-        self.word = get_random_word()
-        self.guessed_word = []
-        for i in range(len(self.word)):
-            self.guessed_word.append("_")
+# Set up the window
+win_width = 640
+win_height = 480
+win = pygame.display.set_mode((win_width, win_height))
+pygame.display.set_caption("Hangman")
 
-    def play(self):
-        guessed_letters = []
-        while True:
-            _ = system('clear')
-            guessed_letters_str = ' '.join(guessed_letters)
-            print(f'Your guesses: {guessed_letters_str}')
-            print(self.draw_hangman())
+# Set up the hangman parts
+hangman_parts = [
+    pygame.Rect(50, win_height - 50, 100, 20), # base
+    pygame.Rect(100, 50, 20, win_height - 100), # post
+    pygame.Rect(100, 50, 150, 20), # top
+    pygame.Rect(240, 70, 10, 40), # head
+    pygame.Rect(245, 110, 2, 100), # body
+    pygame.Rect(240, 150, 10, 2), # left arm
+    pygame.Rect(250, 150, 10, 2), # right arm
+    pygame.Rect(245, 210, 2, 80), # left leg
+    pygame.Rect(250, 210, 2, 80), # right leg
+]
+num_wrong_guesses = 0
 
-            if self.guessed_word == self.word:
-                print(self.word)
-                print('You win!')
-                break
+# Set up the word list
+word_list = ["python", "game", "hangman"]
+word = random.choice(word_list)
+guessed_word = ["_" for i in range(len(word))]
 
-            if self.incorrect_count >= 4:
-                print("You lose!")
-                print(f"The word was: {self.word}")
-                break
+# Set up the font
+font = pygame.font.SysFont(None, 32)
 
-            print(" ".join(self.guessed_word))
-            print("Guess a letter!")
-            guess = input()
-            if guess not in guessed_letters:
-                guessed_letters.append(guess)
-            if guess in self.word:
-                for i in range(len(self.word)):
-                    if self.word[i] == guess:
-                        self.guessed_word[i] = guess
-            else:
-                self.incorrect_count += 1
+# Set up the clock
+clock = pygame.time.Clock()
 
-    def draw_hangman(self):
-        if self.incorrect_count == 0:
-            print("   _____ \n"
-                  "  |     | \n"
-                  "  |     |\n"
-                  "  |     | \n"
-                  "  |      \n"
-                  "  |      \n"
-                  "  |      \n"
-                  "__|__\n")
-        elif self.incorrect_count == 1:
-            print("   _____ \n"
-                  "  |     | \n"
-                  "  |     |\n"
-                  "  |     | \n"
-                  "  |     O \n"
-                  "  |      \n"
-                  "  |      \n"
-                  "__|__\n")
-        elif self.incorrect_count == 2:
-            print("   _____ \n"
-                  "  |     | \n"
-                  "  |     |\n"
-                  "  |     | \n"
-                  "  |     O \n"
-                  "  |    /|\ \n"
-                  "  |      \n"
-                  "__|__\n")
-        elif self.incorrect_count == 3:
-            print("   _____ \n"
-                  "  |     | \n"
-                  "  |     |\n"
-                  "  |     | \n"
-                  "  |     O \n"
-                  "  |    /|\ \n"
-                  "  |     \n"
-                  "__|__\n")
-        elif self.incorrect_count == 4:
-            print("   _____ \n"
-                  "  |     | \n"
-                  "  |     |\n"
-                  "  |     | \n"
-                  "  |     O \n"
-                  "  |    /|\ \n"
-                  "  |    / \ \n"
-                  "__|__\n")
+# Run the game loop
+game_running = True
+while game_running:
+    # Handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.unicode.isalpha():
+                # Check if the letter has already been guessed
+                if event.unicode in guessed_word:
+                    continue
 
+                # Check if the letter is in the word
+                if event.unicode in word:
+                    for i in range(len(word)):
+                        if word[i] == event.unicode:
+                            guessed_word[i] = event.unicode
+                else:
+                    num_wrong_guesses += 1
 
-game = Hangman()
-game.play()
+    # Check if the player has won or lost
+    if num_wrong_guesses == len(hangman_parts):
+        text = font.render("You lose! The word was '%s'." % word, True, (255, 0, 0))
+        game_running = False
+    elif "_" not in guessed_word:
+        text = font.render("You win! The word was '%s'." % word, True, (0, 255, 0))
+        game_running = False
+    else:
+        text = font.render(" ".join(guessed_word), True, (255, 255, 255))
+
+    # Draw the game objects
+    win.fill((0, 0, 0))
+    for part in hangman_parts[:num_wrong_guesses]:
+        pygame.draw.rect(win, (255, 255, 255), part)
+    win.blit(text, (10, 10))
+    pygame.display.update()
+
+    # Limit the frame rate
+    clock.tick(60)
+
+# Clean up Pygame
+pygame.quit()
