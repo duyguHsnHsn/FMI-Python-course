@@ -14,11 +14,18 @@ player_image = pygame.image.load("../images/marathon.png").convert_alpha()
 bird_image = pygame.image.load("../images/dove.png").convert_alpha()
 coin_image = pygame.image.load("../images/dollar.png").convert_alpha()
 
+winner_image = pygame.image.load("../images/winner.png").convert_alpha()
+winner_rect = winner_image.get_rect(topleft=(350, 230))
+
+lose_image = pygame.image.load("../images/game-over.png").convert_alpha()
+lose_rect = winner_image.get_rect(topleft=(350, 230))
+
 
 class RunAndJumpGame:
-    def __init__(self):
+    def __init__(self, aimed_score: int):
         self._game_gravity = 0
         self._score = 0
+        self._aimed_score = aimed_score
         self._enemy = enemy_image.get_rect(bottomright=(800, 530))
         self._background = pygame.transform.scale(background_image, (900, 600))
         self._player = player_image.get_rect(bottomleft=(80, 540))
@@ -50,10 +57,11 @@ class RunAndJumpGame:
             self._bird.left = random.randint(900, 920)
 
     def _fix_coin_position(self):
-            self._coin.left = random.randint(900, 920)
-            self._coin.y = random.randint(430, 500)
+        self._coin.left = random.randint(900, 920)
+        self._coin.y = random.randint(430, 500)
 
     def start(self):
+        end = False
         run = True
         while run:
             for event in pygame.event.get():
@@ -69,21 +77,31 @@ class RunAndJumpGame:
             screen.blit(bird_image, self._bird)
             screen.blit(coin_image, self._coin)
 
-            self._move_enemy()
-            self._move_bird()
-            self._move_coin()
-            self._fix_enemy_against_screen_borders()
-            if self._coin.right <= 0:
-                self._fix_coin_position()
-            self._fix_birds_position()
+            if not end:
+                self._move_enemy()
+                self._move_bird()
+                self._move_coin()
+                self._fix_enemy_against_screen_borders()
+                if self._coin.right <= 0:
+                    self._fix_coin_position()
+                self._fix_birds_position()
 
             # collision with the enemy
             if self._player.colliderect(self._enemy):
-                run = False
+                screen.fill((0, 0, 0))
+                screen.blit(lose_image, lose_rect)
+                end = True
 
             # collision with the bird
             if self._player.colliderect(self._bird):
-                run = False
+                screen.fill((0, 0, 0))
+                screen.blit(lose_image, lose_rect)
+                end = True
+
+            if self._aimed_score == self._score:
+                screen.fill((0, 0, 0))
+                screen.blit(winner_image, winner_rect)
+                end = True
 
             self._game_gravity += 1
             self._player.y += self._game_gravity
@@ -97,7 +115,3 @@ class RunAndJumpGame:
             screen.blit(result, (10, 10))
             pygame.display.update()
             clock.tick(60)
-
-
-game = RunAndJumpGame()
-game.start()

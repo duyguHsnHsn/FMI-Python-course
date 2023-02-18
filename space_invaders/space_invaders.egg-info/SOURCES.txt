@@ -1,0 +1,8 @@
+setup.py
+spinv.py
+space_invaders.egg-info/PKG-INFO
+space_invaders.egg-info/SOURCES.txt
+space_invaders.egg-info/dependency_links.txt
+space_invaders.egg-info/entry_points.txt
+space_invaders.egg-info/requires.txt
+space_invaders.egg-info/top_level.txt

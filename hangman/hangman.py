@@ -1,5 +1,5 @@
 import click
-from game import *
+from hangman_game import *
 
 
 @click.command(help="This is a simple hangman game.")
@@ -7,10 +7,11 @@ from game import *
     "-l",
     "--word-len",
     prompt="Length of the word:",
-    default="5",
+    default=4,
+    type=click.INT,
     help="The length of the world you are going to guess. The default length is 5. The max length is 8.")
 def cli(word_len):
-    if ord(word_len) in range(ord("1"), ord("9")):
+    if word_len in range(0, 9):
         game = Hangman(int(word_len))
         game.start()
     else:

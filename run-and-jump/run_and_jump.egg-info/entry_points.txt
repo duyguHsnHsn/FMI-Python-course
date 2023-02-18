@@ -1,0 +1,2 @@
+[console_scripts]
+raj = raj:cli

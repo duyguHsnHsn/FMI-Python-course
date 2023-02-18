@@ -14,9 +14,15 @@ pygame.display.set_caption("Coin collector")
 font = pygame.font.Font('freesansbold.ttf', 32)
 clock = pygame.time.Clock()
 
+winner_image = pygame.image.load("../images/winner.png").convert_alpha()
+winner_rect = winner_image.get_rect(topleft=(170, 170))
+
+lose_image = pygame.image.load("../images/game-over.png").convert_alpha()
+lose_rect = winner_image.get_rect(topleft=(170, 170))
+
 
 class CoinCollectorGame:
-    def __init__(self, bot_speed):
+    def __init__(self, bot_speed, coin_num):
         # Set up the player and bot
         self.player = MovingElement(win_width, win_height, 50, "../images/purse.png", 5)
         self.bot = MovingElement(win_width, win_height, 50, "../images/robot.png", bot_speed)
@@ -25,13 +31,14 @@ class CoinCollectorGame:
 
         # Set up the coins
         self.coins = []
-        for i in range(10):
+        for i in range(coin_num):
             coin = MovingElement(win_width, win_height, 50, "../images/star.png", 2)
-            coin.x = random.randint(0, win_width - 20)
-            coin.y = random.randint(0, win_height - 20)
-            coin.rect = coin.image.get_rect(bottomright=(coin.x, coin.y))
+            coin.x = random.randint(0, win_width - 200)
+            coin.y = random.randint(0, win_height - 200)
+            coin.rect = coin.image.get_rect(topleft=(coin.x, coin.y))
             self.coins.append(coin)
 
+        self.coin_num = coin_num
         self.score = 0
 
     def _move_player(self):
@@ -56,27 +63,22 @@ class CoinCollectorGame:
             self.bot.rect.y -= self.bot.speed
 
     def start(self):
+        end = False
         game_running = True
         while game_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     game_running = False
-            self._move_player()
-            self._move_bot()
+
+            if not end:
+                self._move_player()
+                self._move_bot()
 
             # Handle collision with coins
             for coin in self.coins:
                 if self.player.rect.colliderect(coin.rect):
                     self.coins.remove(coin)
                     self.score += 1
-
-            # Handle collision with bot
-            if self.player.rect.colliderect(self.bot.rect):
-                game_running = False
-
-            # All coins collected
-            if self.score == 10:
-                game_running = False
 
             # Draw the game objects
             screen.fill((0, 0, 0))
@@ -86,5 +88,18 @@ class CoinCollectorGame:
             screen.blit(result, (10, 10))
             for coin in self.coins:
                 screen.blit(coin.image, coin.rect)
+
+            # Handle collision with bot
+            if self.player.rect.colliderect(self.bot.rect):
+                screen.fill((0, 0, 0))
+                screen.blit(lose_image, lose_rect)
+                end = True
+
+            # All coins collected
+            if self.score == self.coin_num:
+                screen.fill((0, 0, 0))
+                screen.blit(winner_image, winner_rect)
+                end = True
+
             pygame.display.update()
             clock.tick(60)
