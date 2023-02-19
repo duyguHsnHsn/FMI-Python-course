@@ -11,8 +11,6 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Hangman")
 font = pygame.font.Font(None, 36)
 clock = pygame.time.Clock()
-tomb = pygame.image.load("../images/tombstone.png").convert_alpha()
-tomb_rect = tomb.get_rect(bottomright=(250, 150))
 
 # Define the hangman parts
 man = [pygame.Rect(50, 400, 100, 20), pygame.Rect(90, 100, 20, 320), pygame.Rect(90, 100, 240, 20),
